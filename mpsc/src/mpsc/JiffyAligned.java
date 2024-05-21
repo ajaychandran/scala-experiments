@@ -57,7 +57,7 @@ public class JiffyAligned<A> extends JiffyWritePadding implements Queue<A> {
 	private final int grow;
 
 	public JiffyAligned(int step) {
-		this(step, 1);
+		this(step, -1);
 	}
 
 	public JiffyAligned(int step, int grow) {
