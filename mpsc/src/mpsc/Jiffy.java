@@ -14,7 +14,7 @@ public class Jiffy<A> implements Queue<A> {
 	private volatile int last;
 
 	public Jiffy(int step) {
-		this(step, -1);
+		this(step, step / 2);
 	}
 
 	public Jiffy(int step, int grow) {
