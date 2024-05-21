@@ -10,7 +10,8 @@ object QueueSpec extends ZIOSpecDefault {
 
   def spec =
     suite("Queue")(
-      spec("Jiffy", new Jiffy[AnyRef](4, 1))
+      spec("Jiffy", new Jiffy[AnyRef](4, 1)),
+      spec("Vyukov", new Vyukov())
     )
 
   def spec(name: String, q: Queue[AnyRef]) =
@@ -19,7 +20,7 @@ object QueueSpec extends ZIOSpecDefault {
         check(Gen.chunkOf1(Gen.uuid))(expected =>
           for {
             consumer <- ZIO
-              .succeed(q.dequeue())
+              .succeed(q.poll())
               .repeatWhile(_ == null)
               .replicateZIO(expected.length)
               .fork
@@ -28,7 +29,7 @@ object QueueSpec extends ZIOSpecDefault {
                 .withParallelism(expected.length)(
                   ZIO
                     .foreachParDiscard(expected)(s =>
-                      ZIO.succeedBlocking(q.enqueue(s))
+                      ZIO.succeedBlocking(q.add(s))
                     )
                 )
                 .fork
@@ -40,11 +41,11 @@ object QueueSpec extends ZIOSpecDefault {
         check(Gen.chunkOf1(Gen.uuid))(expected =>
           for {
             consumer <- ZIO
-              .succeed(q.dequeue())
+              .succeed(q.poll())
               .repeatWhile(_ == null)
               .replicateZIO(expected.length)
               .fork
-            _ <- ZIO.succeedBlocking(expected.foreach(q.enqueue)).fork
+            _ <- ZIO.succeedBlocking(expected.foreach(q.add)).fork
             actual <- consumer.join
           } yield assert(actual)(Assertion.equalTo(expected.toChunk))
         )

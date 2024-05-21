@@ -17,6 +17,7 @@ class EnqueueBenchmark extends QueueBenchmarkConfig {
   @Param(
     Array(
       "Jiffy",
+      "Vyukov",
       "ConcurrentLinkedQueue",
       "MpscLinkedQueue"
     )

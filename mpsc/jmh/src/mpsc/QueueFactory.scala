@@ -6,6 +6,8 @@ object QueueFactory {
     name match {
       case "Jiffy" =>
         new QWrapper(new Jiffy(step, grow))
+      case "Vyukov" =>
+        new QWrapper(new Vyukov())
       case "ConcurrentLinkedQueue" =>
         new JWrapper(new java.util.concurrent.ConcurrentLinkedQueue())
       case "MpscLinkedQueue" =>
