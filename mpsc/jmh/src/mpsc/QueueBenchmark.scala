@@ -19,6 +19,7 @@ class QueueBenchmark extends QueueBenchmarkConfig {
       "ConcurrentLinkedQueue",
       "Jiffy",
       "JiffyAligned",
+      "MpscLinkedQueue",
       "Vyukov"
     )
   )
