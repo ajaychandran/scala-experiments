@@ -11,7 +11,8 @@ object QueueSpec extends ZIOSpecDefault {
   def spec =
     suite("Queue")(
       spec("Jiffy", new Jiffy[AnyRef](4, 1)),
-      spec("Vyukov", new Vyukov())
+      spec("JiffyAligned", new JiffyAligned[AnyRef](4, 1)),
+      spec("Vyukov", new Vyukov[AnyRef]())
     )
 
   def spec(name: String, q: Queue[AnyRef]) =

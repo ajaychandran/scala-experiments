@@ -16,10 +16,10 @@ class QueueBenchmark extends QueueBenchmarkConfig {
 
   @Param(
     Array(
-      "Jiffy",
-      "Vyukov",
       "ConcurrentLinkedQueue",
-      "MpscLinkedQueue"
+      "Jiffy",
+      "JiffyAligned",
+      "Vyukov"
     )
   )
   var name: String = _
@@ -64,13 +64,13 @@ class QueueBenchmark extends QueueBenchmarkConfig {
   @GroupThreads(1)
   def enqueue_01() = enqueue(opi)
 
-  @Benchmark
-  @Group("p02")
-  @GroupThreads(1)
-  def dequeue_02() = dequeue(opi)
+  // @Benchmark
+  // @Group("p02")
+  // @GroupThreads(1)
+  // def dequeue_02() = dequeue(opi)
 
-  @Benchmark
-  @Group("p02")
-  @GroupThreads(2)
-  def enqueue_02() = enqueue(opi)
+  // @Benchmark
+  // @Group("p02")
+  // @GroupThreads(2)
+  // def enqueue_02() = enqueue(opi)
 }

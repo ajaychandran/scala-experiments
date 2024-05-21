@@ -16,10 +16,10 @@ class EnqueueBenchmark extends QueueBenchmarkConfig {
 
   @Param(
     Array(
-      "Jiffy",
-      "Vyukov",
       "ConcurrentLinkedQueue",
-      "MpscLinkedQueue"
+      "Jiffy",
+      "JiffyAligned",
+      "Vyukov"
     )
   )
   var name: String = _
