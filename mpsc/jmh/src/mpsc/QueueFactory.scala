@@ -2,14 +2,14 @@ package mpsc
 
 object QueueFactory {
 
-  def apply[A <: AnyRef](name: String, step: Int, grow: Int): Queue[A] =
+  def apply[A <: AnyRef](name: String): Queue[A] =
     name match {
       case "ConcurrentLinkedQueue" =>
         new JWrapper(new java.util.concurrent.ConcurrentLinkedQueue())
       case "Jiffy" =>
+        val step = Option(Integer.getInteger("step")).fold(4)(_.intValue())
+        val grow = Option(Integer.getInteger("grow")).fold(1)(_.intValue())
         new QWrapper(new Jiffy(step, grow))
-      case "JiffyAligned" =>
-        new QWrapper(new JiffyAligned(step, grow))
       case "MpscLinkedQueue" =>
         new JWrapper(new org.jctools.queues.MpscLinkedQueue())
       case "Vyukov" =>

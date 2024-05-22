@@ -12,13 +12,12 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Warmup(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-class EnqueueBenchmark extends QueueBenchmarkConfig {
+class EnqueueBenchmark extends BenchmarkConfig {
 
   @Param(
     Array(
       "ConcurrentLinkedQueue",
       "Jiffy",
-      "JiffyAligned",
       "MpscLinkedQueue",
       "Vyukov"
     )
@@ -32,7 +31,7 @@ class EnqueueBenchmark extends QueueBenchmarkConfig {
 
   @Setup(Level.Iteration)
   def create(): Unit = {
-    q = QueueFactory(name, step, grow)
+    q = QueueFactory(name)
   }
 
   @Benchmark

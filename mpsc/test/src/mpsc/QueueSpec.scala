@@ -10,10 +10,8 @@ object QueueSpec extends ZIOSpecDefault {
 
   def spec =
     suite("Queue")(
-      spec("Jiffy", new Jiffy[AnyRef](8)),
-      spec("Jiffy (no eager growth)", new Jiffy[AnyRef](8, -1)),
-      spec("JiffyAligned", new JiffyAligned[AnyRef](8)),
-      spec("JiffyAligned (no eager growth)", new JiffyAligned[AnyRef](8, -1)),
+      spec("Jiffy", new Jiffy[AnyRef](4, 1)),
+      spec("Jiffy (no eager growth)", new Jiffy[AnyRef](4, -1)),
       spec("Vyukov", new Vyukov[AnyRef]())
     )
 

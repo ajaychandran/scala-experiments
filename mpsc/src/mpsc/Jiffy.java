@@ -7,15 +7,11 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 @SuppressWarnings("rawtypes")
 public class Jiffy<A> implements Queue<A> {
 
-	private Segment read;
+	private transient Segment read;
 	private final int grow;
 
-	private volatile Segment write;
-	private volatile int last;
-
-	public Jiffy(int step) {
-		this(step, step / 2);
-	}
+	private transient volatile Segment write;
+	private transient volatile int last;
 
 	public Jiffy(int step, int grow) {
 		this.read = this.write = new Segment(null, step, 0);

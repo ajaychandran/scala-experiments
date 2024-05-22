@@ -1,13 +1,12 @@
 package mpsc;
 
-import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 public class Vyukov<A> implements Queue<A> {
 
-	private Node read;
+	private transient Node read;
 	@SuppressWarnings("unused")
-	private volatile Node write;
+	private transient volatile Node write;
 
 	public Vyukov() {
 		this.read = this.write = new Node(null);
@@ -16,25 +15,26 @@ public class Vyukov<A> implements Queue<A> {
 	public void add(A data) {
 		assert (data != null);
 
-		Node last = new Node(data);
-		Node tail = WRITE.getAndSet(this, last);
-		NEXT.lazySet(tail, last);
+		Node next = new Node(data);
+
+		AtomicReferenceFieldUpdater<Node, Node> NEXT = Vyukov.NEXT;
+
+		Node prev = WRITE.getAndSet(this, next);
+		NEXT.lazySet(prev, next);
 	}
 
+	@SuppressWarnings("unchecked")
 	public A poll() {
-		Node head = this.read.next;
+		Node next = this.read.next;
 
-		if (head == null)
+		if (next == null)
 			return null;
 
-		@SuppressWarnings("unchecked")
-		A data = (A) (head.data);
-		head.data = null;
-		this.read = head;
-		return data;
+		this.read = next;
+		return (A) (next.data);
 	}
 
-	static class Node implements Serializable {
+	static class Node {
 		Object data;
 		volatile Node next;
 

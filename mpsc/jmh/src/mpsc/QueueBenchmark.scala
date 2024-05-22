@@ -7,18 +7,17 @@ import java.util.concurrent.TimeUnit
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @State(Scope.Group)
-@OperationsPerInvocation(1)
+@OperationsPerInvocation(4)
 @Fork(2)
 @Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @Warmup(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-class QueueBenchmark extends QueueBenchmarkConfig {
+class QueueBenchmark extends BenchmarkConfig {
 
   @Param(
     Array(
       "ConcurrentLinkedQueue",
       "Jiffy",
-      "JiffyAligned",
       "MpscLinkedQueue",
       "Vyukov"
     )
@@ -32,7 +31,7 @@ class QueueBenchmark extends QueueBenchmarkConfig {
 
   @Setup(Level.Iteration)
   def create(): Unit = {
-    q = QueueFactory(name, step, grow)
+    q = QueueFactory(name)
   }
 
   def dequeue(n: Int): Int = {
