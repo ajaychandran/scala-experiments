@@ -4,9 +4,9 @@ import mill.contrib.jmh.JmhModule
 import mill.scalalib._
 import mill.scalalib.scalafmt.ScalafmtModule
 
-object `mpsc` extends Mpsc
+object `zio-8807` extends Zio8807
 
-trait Mpsc extends BaseScalaModule {
+trait Zio8807 extends BaseScalaModule {
 
   object jmh extends ScalaJmhModule {
     override def ivyDeps =
