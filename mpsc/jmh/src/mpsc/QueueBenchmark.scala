@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit
 @State(Scope.Group)
 @OperationsPerInvocation(4)
 @Fork(2)
-@Measurement(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
-@Warmup(iterations = 20, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 15, time = 1, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 15, time = 1, timeUnit = TimeUnit.SECONDS)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 class QueueBenchmark extends BenchmarkConfig {
 
