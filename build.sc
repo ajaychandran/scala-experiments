@@ -5,6 +5,7 @@ import mill.scalalib._
 import mill.scalalib.scalafmt.ScalafmtModule
 
 object `zio-8807` extends Zio8807
+object `zio-8861` extends Zio8861
 
 trait Zio8807 extends BaseScalaModule {
 
@@ -12,6 +13,15 @@ trait Zio8807 extends BaseScalaModule {
     override def ivyDeps =
       super.ivyDeps() ++ Agg(Deps.`jct-tools`, Deps.`jol-core`)
   }
+
+  object test extends ScalaTestModule
+}
+
+trait Zio8861 extends BaseScalaModule {
+
+  override def ivyDeps = Agg(Deps.`zio`)
+
+  object jmh extends ScalaJmhModule
 
   object test extends ScalaTestModule
 }
@@ -59,5 +69,6 @@ object Deps {
 
   val `jct-tools` = ivy"org.jctools:jctools-core:4.0.3"
 
-  val `zio-test-sbt` = ivy"dev.zio::zio-test-sbt:2.0.21"
+  val `zio` = ivy"dev.zio::zio:2.1.1"
+  val `zio-test-sbt` = ivy"dev.zio::zio-test-sbt:2.1.1"
 }

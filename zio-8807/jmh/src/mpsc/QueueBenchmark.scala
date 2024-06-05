@@ -5,14 +5,12 @@ import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
 
-@BenchmarkMode(Array(Mode.AverageTime))
+@BenchmarkMode(Array(Mode.SingleShotTime))
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Group)
-@OperationsPerInvocation(4)
-@Fork(2)
-@Measurement(iterations = 15, time = 1, timeUnit = TimeUnit.SECONDS)
-@Warmup(iterations = 15, time = 1, timeUnit = TimeUnit.SECONDS)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
-class QueueBenchmark extends BenchmarkConfig {
+@Measurement(batchSize = 100000, iterations = 20)
+@Warmup(batchSize = 100000, iterations = 20)
+class QueueBenchmark {
 
   @Param(
     Array(
@@ -22,7 +20,7 @@ class QueueBenchmark extends BenchmarkConfig {
       "Vyukov"
     )
   )
-  var name: String = _
+  var queue: String = _
 
   var q: Queue[AnyRef] = _
 
@@ -30,47 +28,69 @@ class QueueBenchmark extends BenchmarkConfig {
     new Object()
 
   @Setup(Level.Iteration)
-  def create(): Unit = {
-    q = QueueFactory(name)
+  def setup(): Unit =
+    q = QueueFactory(queue)
+
+  def add() = {
+    val a = new Object()
+    q.add(a)
+    a
   }
 
-  def dequeue(n: Int): Int = {
+  def poll(n: Int) = {
     var i = 0
     while (i < n) {
-      q.add(element())
       while (null == q.poll()) {}
       i += 1
     }
     i
   }
 
-  def enqueue(n: Int): Int = {
-    var i = 0
-    while (i < n) {
-      val a = element()
-      q.add(a)
-      i += 1
-    }
-    i
-  }
+  @Benchmark
+  @Group("p01")
+  @GroupThreads(1)
+  def add_01() =
+    add()
 
   @Benchmark
   @Group("p01")
   @GroupThreads(1)
-  def dequeue_01() = dequeue(opi)
-
-  @Benchmark
-  @Group("p01")
-  @GroupThreads(1)
-  def enqueue_01() = enqueue(opi)
-
-  @Benchmark
-  @Group("p02")
-  @GroupThreads(1)
-  def dequeue_02() = dequeue(opi)
+  def poll_01() =
+    poll(1)
 
   @Benchmark
   @Group("p02")
   @GroupThreads(2)
-  def enqueue_02() = enqueue(opi)
+  def add_02() =
+    add()
+
+  @Benchmark
+  @Group("p02")
+  @GroupThreads(1)
+  def poll_02() =
+    poll(2)
+
+  @Benchmark
+  @Group("p03")
+  @GroupThreads(3)
+  def add_03() =
+    add()
+
+  @Benchmark
+  @Group("p03")
+  @GroupThreads(1)
+  def poll_03() =
+    poll(3)
+
+  @Benchmark
+  @Group("p07")
+  @GroupThreads(7)
+  def add_07() =
+    add()
+
+  @Benchmark
+  @Group("p07")
+  @GroupThreads(1)
+  def poll_07() =
+    poll(7)
 }
