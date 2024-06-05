@@ -17,7 +17,8 @@ class QueueBenchmark {
       "ConcurrentLinkedQueue",
       "Jiffy",
       "MpscLinkedQueue",
-      "Vyukov"
+      "Vyukov",
+      "VyukovExtend"
     )
   )
   var queue: String = _

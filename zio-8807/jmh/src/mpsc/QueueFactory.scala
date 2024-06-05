@@ -14,6 +14,8 @@ object QueueFactory {
         new JWrapper(new org.jctools.queues.MpscLinkedQueue())
       case "Vyukov" =>
         new QWrapper(new Vyukov())
+      case "VyukovExtend" =>
+        new QWrapper(new VyukovExtend())
       case _ =>
         throw new RuntimeException(s"unsupported: $name")
     }
