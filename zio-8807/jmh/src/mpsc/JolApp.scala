@@ -2,6 +2,7 @@ package mpsc
 
 import org.openjdk.jol.info.ClassLayout
 import org.openjdk.jol.vm.VM
+import org.jctools.queues.MpscLinkedQueue
 
 object JolApp extends App {
 
@@ -23,5 +24,8 @@ object JolApp extends App {
   )
   println(
     ClassLayout.parseClass(classOf[vyukov.Padded128[AnyRef]]).toPrintable()
+  )
+  println(
+    ClassLayout.parseClass(classOf[MpscLinkedQueue[AnyRef]]).toPrintable()
   )
 }
