@@ -1,25 +1,47 @@
-package mpsc;
+package mpsc.jiffy;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-@SuppressWarnings("rawtypes")
-public class Jiffy<A> implements Queue<A> {
+import mpsc.Queue;
+
+abstract class Padded64Fields implements Serializable {
+	protected transient volatile int insert;
+	protected transient volatile Padded64.Segment write;
+}
+
+abstract class Padded64FieldsPad extends Padded64Fields {
+	protected int _00;
+	protected long _0;
+	protected long _1;
+	protected long _2;
+	protected long _3;
+	protected long _4;
+	protected long _5;
+	protected long _6;
+	protected long _7;
+}
+
+final public class Padded64<A> extends Padded64FieldsPad implements Queue<A> {
 
 	private final int grow;
-
-	private transient volatile int insert;
-	private transient volatile Segment write;
 	private transient Segment read;
 
-	public Jiffy() {
-		this(4, 1);
+	public Padded64() {
+		this.grow = 1;
+		read = write = new Segment(4);
 	}
 
-	public Jiffy(int step, int grow) {
+	public Padded64(int step) {
+		this.grow = 1;
+		read = write = new Segment(step);
+	}
+
+	public Padded64(int step, int grow) {
 		this.grow = grow;
-		this.read = this.write = new Segment(null, step, 0);
+		read = write = new Segment(step);
 	}
 
 	public void add(A data) {
@@ -28,7 +50,7 @@ public class Jiffy<A> implements Queue<A> {
 
 		// load instance fields locally to prevent reload after sync
 		final AtomicReferenceFieldUpdater<Segment, Segment> NEXT = Segment.NEXT;
-		final AtomicReferenceFieldUpdater<Jiffy, Segment> WRITE = Jiffy.WRITE;
+		final AtomicReferenceFieldUpdater<Padded64Fields, Segment> WRITE = Padded64.WRITE;
 		final int grow = this.grow;
 
 		Segment write = this.write;
@@ -91,26 +113,11 @@ public class Jiffy<A> implements Queue<A> {
 		} while (true);
 	}
 
-	public boolean isEmpty() {
-		Segment read = this.read;
-		int index = read.index;
-		final int start = read.start;
-
-		return start + index == this.insert;
-	}
-
-	public boolean nonEmpty() {
-		Segment read = this.read;
-		int index = read.index;
-		final int start = read.start;
-
-		return start + index < this.insert;
-	}
-
+	@SuppressWarnings("unchecked")
 	public A poll() {
 
 		// load instance fields locally to prevent reload after sync
-		final Object READ = Jiffy.READ;
+		final Object READ = Padded64.READ;
 
 		Segment read = this.read;
 		int index = read.index;
@@ -171,13 +178,19 @@ public class Jiffy<A> implements Queue<A> {
 		} while (true);
 	}
 
-	private static class Segment extends AtomicReferenceArray<Object> {
+	static class Segment extends AtomicReferenceArray<Object> {
 
 		final Segment prev;
 		final int start;
 		int index;
 
 		volatile Segment next;
+
+		Segment(int size) {
+			super(size);
+			this.prev = null;
+			this.start = 0;
+		}
 
 		Segment(Segment prev, int size, int start) {
 			super(size);
@@ -191,8 +204,8 @@ public class Jiffy<A> implements Queue<A> {
 
 	private static final Object READ = new Object();
 
-	private static final AtomicReferenceFieldUpdater<Jiffy, Segment> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Jiffy.class, Segment.class, "write");
-	private static final AtomicIntegerFieldUpdater<Jiffy> INSERT = AtomicIntegerFieldUpdater.newUpdater(Jiffy.class,
-			"insert");
+	private static final AtomicReferenceFieldUpdater<Padded64Fields, Segment> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(Padded64Fields.class, Segment.class, "write");
+	private static final AtomicIntegerFieldUpdater<Padded64Fields> INSERT = AtomicIntegerFieldUpdater
+			.newUpdater(Padded64Fields.class, "insert");
 }

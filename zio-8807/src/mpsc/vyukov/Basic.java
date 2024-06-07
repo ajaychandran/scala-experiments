@@ -1,15 +1,17 @@
-package mpsc;
+package mpsc.vyukov;
+
+import mpsc.Queue;
 
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-public class Vyukov<A> implements Queue<A> {
+public final class Basic<A> implements Queue<A> {
 
 	private transient Node read;
 	@SuppressWarnings("unused")
 	private transient volatile Node write;
 
-	public Vyukov() {
-		this.read = this.write = new Node(null);
+	public Basic() {
+		read = write = new Node(null);
 	}
 
 	public void add(A data) {
@@ -20,12 +22,12 @@ public class Vyukov<A> implements Queue<A> {
 
 	@SuppressWarnings("unchecked")
 	public A poll() {
-		Node next = this.read.next;
+		Node next = read.next;
 
 		if (next == null)
 			return null;
 
-		this.read = next;
+		read = next;
 		Object data = next.data;
 		next.data = null;
 		return (A) (data);
@@ -38,11 +40,16 @@ public class Vyukov<A> implements Queue<A> {
 		Node(Object data) {
 			this.data = data;
 		}
+
+		Node(Object data, Node next) {
+			this.data = data;
+			this.next = next;
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
-	private static final AtomicReferenceFieldUpdater<Vyukov, Node> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Vyukov.class, Node.class, "write");
+	private static final AtomicReferenceFieldUpdater<Basic, Node> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(Basic.class, Node.class, "write");
 	private static final AtomicReferenceFieldUpdater<Node, Node> NEXT = AtomicReferenceFieldUpdater
 			.newUpdater(Node.class, Node.class, "next");
 }

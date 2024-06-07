@@ -8,17 +8,26 @@ import java.util.concurrent.TimeUnit
 @BenchmarkMode(Array(Mode.SingleShotTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Group)
-@Measurement(batchSize = 100000, iterations = 20)
-@Warmup(batchSize = 100000, iterations = 20)
+@Measurement(batchSize = 100000, iterations = 10)
+@Warmup(batchSize = 100000, iterations = 10)
 class QueueBenchmark {
 
   @Param(
     Array(
       "ConcurrentLinkedQueue",
-      "Jiffy",
       "MpscLinkedQueue",
-      "Vyukov",
-      "VyukovExtend"
+      "custom.Basic",
+      "custom.Padded128",
+      "custom.Padded64",
+      "jiffy.Basic(4)",
+      "jiffy.Padded128(4)",
+      "jiffy.Padded64(4)",
+      "jiffy.Basic(16)",
+      "jiffy.Padded128(16)",
+      "jiffy.Padded64(16)",
+      "vyukov.Basic",
+      "vyukov.Padded128",
+      "vyukov.Padded64"
     )
   )
   var queue: String = _

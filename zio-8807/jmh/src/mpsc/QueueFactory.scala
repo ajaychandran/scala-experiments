@@ -2,20 +2,34 @@ package mpsc
 
 object QueueFactory {
 
+  val Jiffy = """jiffy.Basic[\(](\d+)[\)]""".r
+  val Jiffy128 = """jiffy.Padded128[\(](\d+)[\)]""".r
+  val Jiffy64 = """jiffy.Padded64[\(](\d+)[\)]""".r
+
   def apply[A <: AnyRef](name: String): Queue[A] =
     name match {
       case "ConcurrentLinkedQueue" =>
         new JWrapper(new java.util.concurrent.ConcurrentLinkedQueue())
-      case "Jiffy" =>
-        val step = Option(Integer.getInteger("step")).fold(4)(_.intValue())
-        val grow = Option(Integer.getInteger("grow")).fold(1)(_.intValue())
-        new QWrapper(new Jiffy(step, grow))
       case "MpscLinkedQueue" =>
         new JWrapper(new org.jctools.queues.MpscLinkedQueue())
-      case "Vyukov" =>
-        new QWrapper(new Vyukov())
-      case "VyukovExtend" =>
-        new QWrapper(new VyukovExtend())
+      case "custom.Basic" =>
+        new QWrapper(new custom.Basic())
+      case "custom.Padded128" =>
+        new QWrapper(new custom.Padded128())
+      case "custom.Padded64" =>
+        new QWrapper(new custom.Padded64())
+      case Jiffy(size) =>
+        new QWrapper(new jiffy.Basic(size.toInt))
+      case Jiffy128(size) =>
+        new QWrapper(new jiffy.Padded128(size.toInt))
+      case Jiffy64(size) =>
+        new QWrapper(new jiffy.Padded64(size.toInt))
+      case "vyukov.Basic" =>
+        new QWrapper(new vyukov.Basic())
+      case "vyukov.Padded128" =>
+        new QWrapper(new vyukov.Padded128())
+      case "vyukov.Padded64" =>
+        new QWrapper(new vyukov.Padded64())
       case _ =>
         throw new RuntimeException(s"unsupported: $name")
     }
