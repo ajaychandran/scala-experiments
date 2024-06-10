@@ -47,19 +47,78 @@ trait BaseScalaModule extends ScalaModule with ScalafmtModule {
     def ivyDeps = Agg(Deps.`zio-test-sbt`)
   }
 
-  trait ScalaJmhModule extends JmhModule with ScalaModule with ScalafmtModule {
+  trait ScalaJmhModule extends ScalaModule with ScalafmtModule {
 
-    def jmhCoreVersion = "1.37"
+    def jmhCompile = T {
+      val dest = T.ctx().dest
 
-    override def defaultCommandName() = "runJmh"
+      os.remove(dest)
+      os.makeDir(dest)
+
+      val cmd = util.Jvm.jdkTool("javac")
+      val cp =
+        super.runClasspath().map(_.path).mkString(java.io.File.pathSeparator)
+      val (sources, resources) = jmhGenerate()
+      val files =
+        os.walk(sources).collect { case s if s.ext == "java" => s.toString }
+
+      os.proc(cmd, files, "-cp", cp, "-d", dest).call(dest)
+
+      Agg(PathRef(dest), PathRef(resources))
+    }
+
+    def jmhGenerate = T {
+      val dest = T.ctx().dest
+      val sources = dest / "src"
+      val resources = dest / "resources"
+
+      os.remove(sources)
+      os.remove(resources)
+      os.makeDir(sources)
+      os.makeDir(resources)
+
+      util.Jvm.runSubprocess(
+        "org.openjdk.jmh.generators.bytecode.JmhBytecodeGenerator",
+        (super.runClasspath() ++ jmhGeneratorDeps()).map(_.path),
+        mainArgs = Seq(
+          compile().classes.path.toString,
+          sources.toString,
+          resources.toString,
+          jmhGenerator()
+        )
+      )
+      (sources, resources)
+    }
+
+    def jmhGenerator = T { "default" }
+
+    def jmhGeneratorDeps = T {
+      resolveDeps(
+        T.task {
+          Agg(ivy"org.openjdk.jmh:jmh-generator-bytecode:${jmhVersion()}")
+            .map(bindDependency())
+        }
+      )()
+    }
+
+    def jmhVersion = T { "1.37" }
+
+    override def ivyDeps =
+      super.ivyDeps() ++ Agg(ivy"org.openjdk.jmh:jmh-core:${jmhVersion()}")
+    override def mainClass =
+      Some("org.openjdk.jmh.Main")
+    override def runClasspath =
+      super.runClasspath() ++ jmhCompile()
+    override def upstreamAssemblyClasspath =
+      super.upstreamAssemblyClasspath() ++ jmhCompile()
+
+    override def mandatoryScalacOptions = outer.mandatoryScalacOptions()
     override def moduleDeps = Seq(outer)
-
     override def scalaOrganization = outer.scalaOrganization()
     override def scalaVersion = outer.scalaVersion()
     override def scalacPluginIvyDeps = outer.scalacPluginIvyDeps()
     override def scalacPluginClasspath = outer.scalacPluginClasspath()
     override def scalacOptions = outer.scalacOptions()
-    override def mandatoryScalacOptions = outer.mandatoryScalacOptions()
   }
 }
 
