@@ -6,25 +6,28 @@ import org.openjdk.jmh.annotations._
 import java.util.concurrent.TimeUnit
 
 @BenchmarkMode(Array(Mode.SingleShotTime))
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OperationsPerInvocation(1000)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Group)
-@Measurement(batchSize = 100000, iterations = 10)
-@Warmup(batchSize = 100000, iterations = 10)
+@Measurement(batchSize = 1000, iterations = 10)
+@Warmup(batchSize = 1000, iterations = 10)
 class QueueBenchmark {
+
+  val opi = Option(Integer.getInteger("opi")).fold(1000)(_.intValue())
 
   @Param(
     Array(
       "ConcurrentLinkedQueue",
       "MpscLinkedQueue",
-      "custom.Basic",
-      "custom.Padded128",
-      "custom.Padded64",
-      "jiffy.Basic(4)",
-      "jiffy.Padded128(4)",
-      "jiffy.Padded64(4)",
-      "jiffy.Basic(16)",
-      "jiffy.Padded128(16)",
-      "jiffy.Padded64(16)",
+      // "custom.Basic",
+      // "custom.Padded128",
+      // "custom.Padded64",
+      // "jiffy.Basic(4)",
+      // "jiffy.Padded128(4)",
+      // "jiffy.Padded64(4)",
+      // "jiffy.Basic(16)",
+      // "jiffy.Padded128(16)",
+      // "jiffy.Padded64(16)",
       "vyukov.Basic",
       "vyukov.Padded128",
       "vyukov.Padded64"
@@ -42,12 +45,18 @@ class QueueBenchmark {
     q = QueueFactory(queue)
 
   def add() = {
-    val a = new Object()
-    q.add(a)
-    a
+    val n = opi
+    var i = 0
+    while (i < n) {
+      val a = new Object()
+      q.add(a)
+      i += 1
+    }
+    i
   }
 
-  def poll(n: Int) = {
+  def poll(producers: Int) = {
+    val n = opi * producers
     var i = 0
     while (i < n) {
       while (null == q.poll()) {}
