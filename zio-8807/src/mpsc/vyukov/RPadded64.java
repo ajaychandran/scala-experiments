@@ -5,36 +5,24 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import mpsc.Queue;
 
-abstract class Padded64ClassPad implements Serializable {
-	protected int _0;
+abstract class RPadded64Write implements Serializable {
+	protected transient volatile RPadded64.Node write;
+}
+
+abstract class RPadded64WritePad extends RPadded64Write {
+	protected long _0;
 	protected long _1;
 	protected long _2;
 	protected long _3;
 	protected long _4;
 	protected long _5;
-	protected long _6;
 }
 
-abstract class Padded64Write extends Padded64ClassPad {
-	protected transient volatile Padded64.Node write;
-}
-
-abstract class Padded64WritePad extends Padded64Write {
-	protected int __0;
-	protected long __1;
-	protected long __2;
-	protected long __3;
-	protected long __4;
-	protected long __5;
-	protected long __6;
-	protected long __7;
-}
-
-public final class Padded64<A> extends Padded64WritePad implements Queue<A> {
+public final class RPadded64<A> extends RPadded64WritePad implements Queue<A> {
 
 	private transient Node read;
 
-	public Padded64() {
+	public RPadded64() {
 		read = write = new Node(null);
 	}
 
@@ -76,6 +64,6 @@ public final class Padded64<A> extends Padded64WritePad implements Queue<A> {
 				Node.class, "next");
 	}
 
-	static final AtomicReferenceFieldUpdater<Padded64Write, Node> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Padded64Write.class, Node.class, "write");
+	static final AtomicReferenceFieldUpdater<RPadded64Write, Node> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(RPadded64Write.class, Node.class, "write");
 }

@@ -22,8 +22,6 @@ private[custom] abstract class Padded128WritePad[A] extends Padded128Write[A] {
   protected val _b = 0L;
   protected val _c = 0L;
   protected val _d = 0L;
-  protected val _e = 0L;
-  protected val _f = 0L;
 }
 
 final class Padded128[A] extends Padded128WritePad[A] with Queue[A] {

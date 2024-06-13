@@ -7,14 +7,8 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import mpsc.Queue;
 
-abstract class Padded128Fields implements Serializable {
-	protected transient volatile int insert;
-	protected transient volatile Padded128.Segment write;
-}
-
-abstract class Padded128FieldsPad extends Padded128Fields {
-	protected int _00;
-	protected long _0;
+abstract class Padded128ClassPad implements Serializable {
+	protected int _0;
 	protected long _1;
 	protected long _2;
 	protected long _3;
@@ -29,10 +23,55 @@ abstract class Padded128FieldsPad extends Padded128Fields {
 	protected long _c;
 	protected long _d;
 	protected long _e;
-	protected long _f;
 }
 
-final public class Padded128<A> extends Padded128FieldsPad implements Queue<A> {
+abstract class Padded128Insert extends Padded128ClassPad {
+	protected transient volatile int insert;
+}
+
+abstract class Padded128InsertPad extends Padded128Insert {
+	protected int __0;
+	protected long __1;
+	protected long __2;
+	protected long __3;
+	protected long __4;
+	protected long __5;
+	protected long __6;
+	protected long __7;
+	protected long __8;
+	protected long __9;
+	protected long __a;
+	protected long __b;
+	protected long __c;
+	protected long __d;
+	protected long __e;
+	protected long __f;
+}
+
+abstract class Padded128Write extends Padded128InsertPad {
+	protected transient volatile Padded128.Segment write;
+}
+
+abstract class Padded128WritePad extends Padded128Write {
+	protected int ___0;
+	protected long ___1;
+	protected long ___2;
+	protected long ___3;
+	protected long ___4;
+	protected long ___5;
+	protected long ___6;
+	protected long ___7;
+	protected long ___8;
+	protected long ___9;
+	protected long ___a;
+	protected long ___b;
+	protected long ___c;
+	protected long ___d;
+	protected long ___e;
+	protected long ___f;
+}
+
+final public class Padded128<A> extends Padded128WritePad implements Queue<A> {
 
 	private final int grow;
 	private transient Segment read;
@@ -58,7 +97,7 @@ final public class Padded128<A> extends Padded128FieldsPad implements Queue<A> {
 
 		// load instance fields locally to prevent reload after sync
 		final AtomicReferenceFieldUpdater<Segment, Segment> NEXT = Segment.NEXT;
-		final AtomicReferenceFieldUpdater<Padded128Fields, Segment> WRITE = Padded128.WRITE;
+		final AtomicReferenceFieldUpdater<Padded128Write, Segment> WRITE = Padded128.WRITE;
 		final int grow = this.grow;
 
 		Segment write = this.write;
@@ -212,8 +251,8 @@ final public class Padded128<A> extends Padded128FieldsPad implements Queue<A> {
 
 	private static final Object READ = new Object();
 
-	private static final AtomicReferenceFieldUpdater<Padded128Fields, Segment> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Padded128Fields.class, Segment.class, "write");
-	private static final AtomicIntegerFieldUpdater<Padded128Fields> INSERT = AtomicIntegerFieldUpdater
-			.newUpdater(Padded128Fields.class, "insert");
+	private static final AtomicReferenceFieldUpdater<Padded128Write, Segment> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(Padded128Write.class, Segment.class, "write");
+	private static final AtomicIntegerFieldUpdater<Padded128Insert> INSERT = AtomicIntegerFieldUpdater
+			.newUpdater(Padded128Insert.class, "insert");
 }

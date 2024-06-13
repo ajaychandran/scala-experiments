@@ -5,14 +5,32 @@ import org.openjdk.jmh.annotations._
 
 import java.util.concurrent.TimeUnit
 
+/** Defines (asymetric) benchmarks to measure the relative performance of MPSC
+  * queues in the presence of concurrent operations. The benchmarks are
+  * organized into groups where each group consists of one or more producer
+  * threads that enqueue an element and a consumer thread that dequeues all
+  * elements.
+  *
+  * The total number of elements transiting the queue in an iteration is
+  * `number_of_producers * batch_size * operations_per_invocation`.
+  *
+  * In an ideal system, that scales linearly with the number of threads, the
+  * measurement for all groups is expected to be the same.
+  *
+  * A `SingleShotTime` mode with a `batchSize` is used because
+  *   - a precise number of elements need to be dequeued
+  *   - the operation does not have a steady state
+  *   - the operation measurement is too small
+  */
 @BenchmarkMode(Array(Mode.SingleShotTime))
 @OperationsPerInvocation(1000)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Group)
-@Measurement(batchSize = 1000, iterations = 10)
-@Warmup(batchSize = 1000, iterations = 10)
+@Measurement(batchSize = 1000, iterations = 20)
+@Warmup(batchSize = 1000, iterations = 20)
 class QueueBenchmark {
 
+  /** _USAGE_: `-opi 1 -jvmArgsAppend -Dopi=1` */
   val opi = Option(Integer.getInteger("opi")).fold(1000)(_.intValue())
 
   @Param(
@@ -20,17 +38,17 @@ class QueueBenchmark {
       "ConcurrentLinkedQueue",
       "MpscLinkedQueue",
       // "custom.Basic",
-      // "custom.Padded128",
       // "custom.Padded64",
-      // "jiffy.Basic(4)",
-      // "jiffy.Padded128(4)",
-      // "jiffy.Padded64(4)",
+      // "custom.Padded128",
       // "jiffy.Basic(16)",
-      // "jiffy.Padded128(16)",
       // "jiffy.Padded64(16)",
+      // "jiffy.Padded128(16)",
       "vyukov.Basic",
-      "vyukov.Padded128",
-      "vyukov.Padded64"
+      "vyukov.Padded32",
+      "vyukov.Padded64",
+      "vyukov.Padded128"
+      // "vyukov.RPadded64",
+      // "vyukov.RPadded128"
     )
   )
   var queue: String = _
@@ -90,26 +108,38 @@ class QueueBenchmark {
     poll(2)
 
   @Benchmark
-  @Group("p03")
-  @GroupThreads(3)
-  def add_03() =
+  @Group("p04")
+  @GroupThreads(4)
+  def add_04() =
     add()
 
   @Benchmark
-  @Group("p03")
+  @Group("p04")
   @GroupThreads(1)
-  def poll_03() =
-    poll(3)
+  def poll_04() =
+    poll(4)
 
   @Benchmark
-  @Group("p07")
-  @GroupThreads(7)
-  def add_07() =
+  @Group("p08")
+  @GroupThreads(8)
+  def add_08() =
     add()
 
   @Benchmark
-  @Group("p07")
+  @Group("p08")
   @GroupThreads(1)
-  def poll_07() =
-    poll(7)
+  def poll_08() =
+    poll(8)
+
+  @Benchmark
+  @Group("p16")
+  @GroupThreads(16)
+  def add_16() =
+    add()
+
+  @Benchmark
+  @Group("p16")
+  @GroupThreads(1)
+  def poll_16() =
+    poll(16)
 }

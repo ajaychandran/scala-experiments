@@ -14,8 +14,6 @@ private[custom] abstract class Padded64WritePad[A] extends Padded64Write[A] {
   protected val _3 = 0L;
   protected val _4 = 0L;
   protected val _5 = 0L;
-  protected val _6 = 0L;
-  protected val _7 = 0L;
 }
 
 final class Padded64[A] extends Padded64WritePad[A] with Queue[A] {

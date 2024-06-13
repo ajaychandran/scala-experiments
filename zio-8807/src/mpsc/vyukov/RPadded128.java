@@ -5,8 +5,12 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import mpsc.Queue;
 
-abstract class Padded128ClassPad implements Serializable {
-	protected int _0;
+abstract class RPadded128Write implements Serializable {
+	protected transient volatile RPadded128.Node write;
+}
+
+abstract class RPadded128WritePad extends RPadded128Write {
+	protected long _0;
 	protected long _1;
 	protected long _2;
 	protected long _3;
@@ -20,37 +24,13 @@ abstract class Padded128ClassPad implements Serializable {
 	protected long _b;
 	protected long _c;
 	protected long _d;
-	protected long _e;
 }
 
-abstract class Padded128Write extends Padded128ClassPad {
-	protected transient volatile Padded128.Node write;
-}
-
-abstract class Padded128WritePad extends Padded128Write {
-	protected int __0;
-	protected long __1;
-	protected long __2;
-	protected long __3;
-	protected long __4;
-	protected long __5;
-	protected long __6;
-	protected long __7;
-	protected long __8;
-	protected long __9;
-	protected long __a;
-	protected long __b;
-	protected long __c;
-	protected long __d;
-	protected long __e;
-	protected long __f;
-}
-
-public final class Padded128<A> extends Padded128WritePad implements Queue<A> {
+public final class RPadded128<A> extends RPadded128WritePad implements Queue<A> {
 
 	private transient Node read;
 
-	public Padded128() {
+	public RPadded128() {
 		read = write = new Node(null);
 	}
 
@@ -92,6 +72,6 @@ public final class Padded128<A> extends Padded128WritePad implements Queue<A> {
 				Node.class, "next");
 	}
 
-	static final AtomicReferenceFieldUpdater<Padded128Write, Node> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Padded128Write.class, Node.class, "write");
+	static final AtomicReferenceFieldUpdater<RPadded128Write, Node> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(RPadded128Write.class, Node.class, "write");
 }

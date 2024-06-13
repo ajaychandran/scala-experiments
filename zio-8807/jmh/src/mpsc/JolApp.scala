@@ -8,6 +8,9 @@ object JolApp extends App {
 
   println(VM.current.details())
   println(
+    ClassLayout.parseClass(classOf[MpscLinkedQueue[AnyRef]]).toPrintable()
+  )
+  println(
     ClassLayout.parseClass(classOf[custom.Padded64[AnyRef]]).toPrintable()
   )
   println(
@@ -26,6 +29,9 @@ object JolApp extends App {
     ClassLayout.parseClass(classOf[vyukov.Padded128[AnyRef]]).toPrintable()
   )
   println(
-    ClassLayout.parseClass(classOf[MpscLinkedQueue[AnyRef]]).toPrintable()
+    ClassLayout.parseClass(classOf[vyukov.RPadded64[AnyRef]]).toPrintable()
+  )
+  println(
+    ClassLayout.parseClass(classOf[vyukov.RPadded128[AnyRef]]).toPrintable()
   )
 }

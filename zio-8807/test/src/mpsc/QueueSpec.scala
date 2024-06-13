@@ -14,13 +14,13 @@ object QueueSpec extends ZIOSpecDefault {
           preservers.elements(new custom.Basic()),
           preservers.order(new custom.Basic())
         ),
-        suite("Padded128")(
-          preservers.elements(new custom.Padded128()),
-          preservers.order(new custom.Padded128())
-        ),
         suite("Padded64")(
           preservers.elements(new custom.Padded64()),
           preservers.order(new custom.Padded64())
+        ),
+        suite("Padded128")(
+          preservers.elements(new custom.Padded128()),
+          preservers.order(new custom.Padded128())
         )
       ),
       suite("Jiffy")(
@@ -28,26 +28,26 @@ object QueueSpec extends ZIOSpecDefault {
           preservers.elements(new jiffy.Basic()),
           preservers.order(new jiffy.Basic())
         ),
-        suite("Padded128")(
-          preservers.elements(new jiffy.Padded128()),
-          preservers.order(new jiffy.Padded128())
-        ),
         suite("Padded64")(
           preservers.elements(new jiffy.Padded64()),
           preservers.order(new jiffy.Padded64())
+        ),
+        suite("Padded128")(
+          preservers.elements(new jiffy.Padded128()),
+          preservers.order(new jiffy.Padded128())
         ),
         suite("(without eager growth)")(
           suite("Basic")(
             preservers.elements(new jiffy.Basic(4, -1)),
             preservers.order(new jiffy.Basic(4, -1))
           ),
-          suite("Padded128")(
-            preservers.elements(new jiffy.Padded128(4, -1)),
-            preservers.order(new jiffy.Padded128(4, -1))
-          ),
           suite("Padded64")(
             preservers.elements(new jiffy.Padded64(4, -1)),
             preservers.order(new jiffy.Padded64(4, -1))
+          ),
+          suite("Padded128")(
+            preservers.elements(new jiffy.Padded128(4, -1)),
+            preservers.order(new jiffy.Padded128(4, -1))
           )
         )
       ),
@@ -56,13 +56,25 @@ object QueueSpec extends ZIOSpecDefault {
           preservers.elements(new vyukov.Basic()),
           preservers.order(new vyukov.Basic())
         ),
-        suite("Padded128")(
-          preservers.elements(new vyukov.Padded128()),
-          preservers.order(new vyukov.Padded128())
+        suite("Padded32")(
+          preservers.elements(new vyukov.Padded32()),
+          preservers.order(new vyukov.Padded32())
         ),
         suite("Padded64")(
           preservers.elements(new vyukov.Padded64()),
           preservers.order(new vyukov.Padded64())
+        ),
+        suite("Padded128")(
+          preservers.elements(new vyukov.Padded128()),
+          preservers.order(new vyukov.Padded128())
+        ),
+        suite("RPadded64")(
+          preservers.elements(new vyukov.RPadded64()),
+          preservers.order(new vyukov.RPadded64())
+        ),
+        suite("RPadded128")(
+          preservers.elements(new vyukov.RPadded128()),
+          preservers.order(new vyukov.RPadded128())
         )
       )
     )

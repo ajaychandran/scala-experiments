@@ -7,24 +7,47 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import mpsc.Queue;
 
-abstract class Padded64Fields implements Serializable {
-	protected transient volatile int insert;
-	protected transient volatile Padded64.Segment write;
-}
-
-abstract class Padded64FieldsPad extends Padded64Fields {
-	protected int _00;
-	protected long _0;
+abstract class Padded64ClassPad implements Serializable {
+	protected int _0;
 	protected long _1;
 	protected long _2;
 	protected long _3;
 	protected long _4;
 	protected long _5;
 	protected long _6;
-	protected long _7;
 }
 
-final public class Padded64<A> extends Padded64FieldsPad implements Queue<A> {
+abstract class Padded64Insert extends Padded64ClassPad {
+	protected transient volatile int insert;
+}
+
+abstract class Padded64InsertPad extends Padded64Insert {
+	protected int __0;
+	protected long __1;
+	protected long __2;
+	protected long __3;
+	protected long __4;
+	protected long __5;
+	protected long __6;
+	protected long __7;
+}
+
+abstract class Padded64Write extends Padded64InsertPad {
+	protected transient volatile Padded64.Segment write;
+}
+
+abstract class Padded64WritePad extends Padded64Write {
+	protected int ___0;
+	protected long ___1;
+	protected long ___2;
+	protected long ___3;
+	protected long ___4;
+	protected long ___5;
+	protected long ___6;
+	protected long ___7;
+}
+
+final public class Padded64<A> extends Padded64WritePad implements Queue<A> {
 
 	private final int grow;
 	private transient Segment read;
@@ -50,7 +73,7 @@ final public class Padded64<A> extends Padded64FieldsPad implements Queue<A> {
 
 		// load instance fields locally to prevent reload after sync
 		final AtomicReferenceFieldUpdater<Segment, Segment> NEXT = Segment.NEXT;
-		final AtomicReferenceFieldUpdater<Padded64Fields, Segment> WRITE = Padded64.WRITE;
+		final AtomicReferenceFieldUpdater<Padded64Write, Segment> WRITE = Padded64.WRITE;
 		final int grow = this.grow;
 
 		Segment write = this.write;
@@ -204,8 +227,8 @@ final public class Padded64<A> extends Padded64FieldsPad implements Queue<A> {
 
 	private static final Object READ = new Object();
 
-	private static final AtomicReferenceFieldUpdater<Padded64Fields, Segment> WRITE = AtomicReferenceFieldUpdater
-			.newUpdater(Padded64Fields.class, Segment.class, "write");
-	private static final AtomicIntegerFieldUpdater<Padded64Fields> INSERT = AtomicIntegerFieldUpdater
-			.newUpdater(Padded64Fields.class, "insert");
+	private static final AtomicReferenceFieldUpdater<Padded64Write, Segment> WRITE = AtomicReferenceFieldUpdater
+			.newUpdater(Padded64Write.class, Segment.class, "write");
+	private static final AtomicIntegerFieldUpdater<Padded64Insert> INSERT = AtomicIntegerFieldUpdater
+			.newUpdater(Padded64Insert.class, "insert");
 }
